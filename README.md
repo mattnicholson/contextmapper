@@ -2,7 +2,7 @@
 
 Javascript to allow data to be variable depending on the context.
 
-The aim of these functions are to allow certain elements of logic to be abstracted away from teh application, and instead to be written directly in the data store so that the data store becomes more reactive to contextual changes, and allowing application logic to be more functional.
+The aim of these functions are to allow certain elements of logic to be abstracted away from the application, and instead to be written directly in the data store so that the data store becomes more reactive to contextual changes, and allowing application logic to be more functional.
 
 ## Quickstart
 
