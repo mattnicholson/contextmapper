@@ -13,6 +13,10 @@ import { hoistContextualValues } from "./index.js";
 
 // Our state map is the source of truth, this has the current data for our application
 const stateMap = {
+
+	// The buckets/namespaces are arbitrary, you can define these however you want
+	// They allow you to have multiple different state groups and avoid property name clashes
+	
 	"@defaults": {
 		greeting: "Hi!",
 	},
