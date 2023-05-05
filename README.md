@@ -6,7 +6,7 @@ The aim of these functions are to allow certain elements of logic to be abstract
 
 ## Quickstart
 
-Import the `hoistContextUalValues` function, then run it, providing 2 objects — an object with contextual properties, and another object that acts as a state map to find the current values that should be used:
+Import the `hoistContextualValues` function, then run it, providing 2 objects — an object with contextual properties, and another object that acts as a state map to find the current values that should be used:
 
 ```
 import { hoistContextualValues } from "./index.js";
@@ -142,5 +142,25 @@ const actualContent = hoistContextualValues(content, {
 	},
 })
 
+// And...hey presto! Our data changes depending on the conditions that are met.
+// In the morning, we get...
+
+/*
+
+{
+	"greeting" : "Morning, World!
+}
+
+*/
+
+/*
+Less logic needed in the view...
+Now that we've created a syntax that makes the data itself a bit more logical and responsive, we can have more basic functional components for our view...
+
+e.g in React:
+
+*/
+
+<MyGreetingComponent greeting={actualContent.greeting} />
 
 ```
