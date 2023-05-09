@@ -1,4 +1,4 @@
-# Context Mapper
+# Context Mapper — Make your data responsive, simplify your views
 
 Javascript API to allow data to be variable depending on the context.
 
