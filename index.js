@@ -160,11 +160,11 @@ export const reconcileContextualValue = (obj, contexts) => {
 			(key) => key !== "default" && key !== "value"
 		);
 		let defaultValue = obj["default"] || obj["value"];
-		if (typeof defaultValue === "function") {
-			finalValue = defaultValue({ contexts });
-		} else {
-			finalValue = defaultValue;
-		}
+		// If the value or default property exists and is a function, return its computed response
+		finalValue =
+			typeof defaultValue === "function"
+				? defaultValue({ contexts })
+				: defaultValue;
 	} else if (typeof obj === "string") {
 		// If nothing is parsed, we will return whatever was passed in
 		possibleValues = [obj];
