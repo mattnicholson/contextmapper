@@ -27,6 +27,7 @@ function getTimeOfDay() {
 const contextMap = {
 	"@defaults": {
 		greeting: "Hi!",
+		loggedOutStatus: "loggedOut",
 	},
 	"@content": {
 		greeting: {
@@ -106,7 +107,12 @@ export const runContextMapExamples = () => {
 			contexts: {
 				...contextMap,
 				"@auth": {
-					status: "loggedOut",
+					// Here we can actually use the 'value' property to tell the system to retrun the value of the function
+					// This allows for more complex values to be computed, or for additional logic to be performed
+					status: {
+						value: ({ contexts }) =>
+							contexts["@defaults"].loggedOutStatus,
+					},
 				},
 			},
 		})
