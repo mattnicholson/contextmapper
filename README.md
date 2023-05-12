@@ -1,6 +1,6 @@
 # Is your data a single source of truth? Or is it a case of 'it depends...'?
 
-If you've got data with many different properties accounting for different use-cases, you may find your views become knotted with logic just to get the right bit of data into your application.
+If you've got data with many different properties accounting for different use-cases, you may find your views become knotted with logic just to get the right bit of data displayed in your application.
 
 ## Context Mapper — Responsive data, simplified views
 
