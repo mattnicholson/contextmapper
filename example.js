@@ -16,6 +16,13 @@ import { hoistContextualValues } from "./index.js";
 		title : "Afternoon, World!"
 	}
 
+	but if it's after 5pm, output
+
+	{
+		id: 23,
+		title : "Evening, World!"
+	}
+
 */
 
 function getTimeOfDay() {
@@ -43,6 +50,11 @@ const contextMap = {
 	},
 	"@date": {
 		meridiem: getTimeOfDay(),
+		getTime: ({ status }) => {
+			const now = new Date();
+			const hours = now.getHours();
+			return { hours: hours, status };
+		},
 	},
 	"@auth": {
 		status: "loggedIn",
@@ -56,6 +68,8 @@ const example1 = {
 		default: "Hello World",
 		"@date.meridiem:am": "Morning, World!",
 		"@date.meridiem:pm": "Afternoon, World!",
+		"@date::getTime[foo:bar,status:@auth.status].hours:>=17":
+			"Evening World!",
 	},
 };
 
