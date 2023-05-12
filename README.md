@@ -225,12 +225,12 @@ The following example shows how a function can actually be run *as part of the c
 const stateMap = {
 	"@auth": : {
 		user : {
-			timezone : "en"
+			timezone : "America/New_York"
 		}
 	}
 	"@date": {
 		// Here our state actually contains a function we can call at runtime whenever we are re-evalutating to resolve a value
-		getTime: getTime: ({timezone:'en'}) => {
+		getTime: getTime: ({timezone:'Europe/London'}) => {
 			// Imaginary function that returns a Date for a timezone
 			const now = new DateForTimezone(timezone);
 			const hours = now.getHours();
