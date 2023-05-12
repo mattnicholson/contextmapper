@@ -5,9 +5,9 @@ If you've got data with many different properties accounting for different use-c
 
 ## What is Context Mapper?
 
-Javascript API to allow data to be variable depending on the context.
+It's a Javascript API to allow data to be transformed into different views depending on the context.
 
-The aim of these functions are to allow certain elements of logic to be abstracted away from the application, and instead to be written directly in the data store so that the data store becomes more reactive to contextual changes, and allowing application logic to be more functional.
+The aim is to allow certain elements of logic to be abstracted away from the application, and instead to be written directly in the data store so that the data store becomes more reactive to contextual changes, and allowing application logic to be more functional.
 
 ### TL;DR:
 
