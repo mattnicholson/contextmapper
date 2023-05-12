@@ -144,7 +144,7 @@ We need to provide a state of contexts so that the script can resolve the values
 
 ### Putting the two together
 
-The parser looks through each object property, and sets the value of each to whichever rule mathes the current state context. If the state map changes, you will need to run the function again to compute the new values based on the updated state.
+The parser looks through each object property, and sets the value of each to whichever rule matches the current state context. If the state map changes, you will need to run the function again to compute the new values based on the updated state.
 
 ### Dynamic example
 
