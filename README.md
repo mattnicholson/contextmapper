@@ -29,9 +29,7 @@ For example: Turning this:
 	}
 }
 ```
-Into this if the right criteria are matched.
-Criteria could be anything — time of day, user preference settings...
-you control how different contextual values resolve to different mutations of the data:
+Into this, depending on some criteria:
 ```
 {
 	colors: {
@@ -47,6 +45,8 @@ for state:
 }
 
 ```
+Criteria could be anything — time of day, user preference settings...
+you control how different contextual values resolve to different mutations of the data.
 
 ## Quickstart
 
