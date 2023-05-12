@@ -9,6 +9,45 @@ Javascript API to allow data to be variable depending on the context.
 
 The aim of these functions are to allow certain elements of logic to be abstracted away from the application, and instead to be written directly in the data store so that the data store becomes more reactive to contextual changes, and allowing application logic to be more functional.
 
+### TL;DR:
+
+It takes an exhaustive set of possible data values, and turns them into a single, *true* set, based on the current state.
+
+For example: Turning this:
+
+```
+{
+	colors: {
+		darkMode : {
+			background : '#111',
+			foreground: '#FFF'
+		},
+		lightMode : {
+			background : '#DDD',
+			foreground: '#222'
+		}
+	}
+}
+```
+Into this if the right criteria are matched.
+Criteria could be anything — time of day, user preference settings...
+you control how different contextual values resolve to different mutations of the data:
+```
+{
+	colors: {
+		background : '#DDD',
+		foreground: '#222'
+	}
+}
+
+for state:
+
+{
+	timeOfDay : 'morning'
+}
+
+```
+
 ## Quickstart
 
 Import the `hoistContextualValues` function, then run it, providing 2 objects — an object with contextual properties, and another object that acts as a state map to find the current values that should be used:
