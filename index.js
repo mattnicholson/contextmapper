@@ -77,7 +77,8 @@ export const hoistContextualValues = (obj, { contexts }) => {
 			{
 				'@foo.context:a':'Response 1',
 				'@foo.context:b||c':'Response 2',
-				default:'Response 3'
+				default:'Response 3',
+				'@items.api::get[id:@entries.current.id].key:value' : 'Response 4'
 			}
 		}
 	}
@@ -135,6 +136,109 @@ export function getNestedObjectProp(o, s) {
 
 /*
 
+	parseFunctionSignature
+	------------------
+
+	Convert a string that's known to have a function call in it into it's returned value
+	(Providing the value matches that's been specified)
+	In other words, ensure the criteria is met using a callback function as part of the criteria
+
+	Function signature is @context.path.to::functionName[argKey:argValue,anotherKey:@context.lookup.address]address.to.key.in.response:valueToMatch
+
+	Signature will be a 2 part array
+	eg: @date.api::getTime[timezone:en].hrs:>=14
+	Gives the signature ['@date.api','getTime[timezone:en].hrs:>=14']
+
+	In the above example, if the api property in the @date namespace has a function 'getTime'
+	and the result of calling it with the arguments {timezone:'en'} returns and object with {hrs: >= 14}
+	then return the value that came back from teh function
+	Otherwise will return null
+
+*/
+
+export function parseFunctionSignature(signature, contexts) {
+	const address = signature[0];
+
+	let pathToFunction = getNestedObjectProp(contexts, address);
+
+	const toParse = signature[1];
+
+	// TODO: Maybe Regex instead?
+
+	let funcName = toParse.split("[")[0];
+
+	// If it's not callable, return
+	if (
+		!(
+			funcName &&
+			pathToFunction[funcName] &&
+			typeof pathToFunction[funcName] === "function"
+		)
+	) {
+		return null;
+	}
+
+	let fn = pathToFunction[funcName];
+
+	let funcProps = toParse.split("[")[1];
+
+	let args = funcProps.split("]")[0];
+	let responseCriteria = funcProps.split("]")[1];
+
+	let responseValueAddress = responseCriteria.split(":")[0];
+	let responseValueMatch = responseCriteria.split(":")[1];
+
+	let callProps = args.length
+		? args.split(",").reduce((reduced, item, ix) => {
+				let keyVal = item.split(":");
+				let k = keyVal[0];
+				let v = keyVal[1];
+				// Allow context references in arguments
+				if (v && v[0] === "@") v = getContextValue(v, contexts);
+
+				const prop = {};
+				prop[k] = v;
+
+				return { ...reduced, ...prop };
+		  }, {})
+		: {};
+
+	let response = fn(callProps);
+
+	let finalValue = responseValueAddress
+		? getNestedObjectProp(response, responseValueAddress)
+		: response;
+
+	let isMatch = doesCriteriaValueMatch(finalValue, responseValueMatch);
+	return doesCriteriaValueMatch(finalValue, responseValueMatch)
+		? finalValue
+		: null;
+}
+
+/*
+
+	doesCriteriaValueMatch
+	------------------
+
+	Compares the actual value in state with the text value in the criteria,
+	which can contain expressions and comparisons
+
+	Allows criteria to be set eg fieldName:>=20 or fieldName:<=20 will compare as an integer 
+
+*/
+
+export function doesCriteriaValueMatch(value, criteriaValue) {
+	if (criteriaValue.match(">=")) {
+		return parseInt(value) >= parseInt(criteriaValue.replace(">=", ""));
+	} else if (criteriaValue.match("<=")) {
+		return parseInt(value) <= parseInt(criteriaValue.replace("<=", ""));
+	} else {
+		return "" + value === criteriaValue;
+	}
+}
+
+/*
+
 	reconcileContextualValue
 	------------------
 
@@ -181,33 +285,53 @@ export const reconcileContextualValue = (obj, contexts) => {
 		for (const part of partsToMatch) {
 			// Context group must start with an @
 			if (part[0] === "@") {
-				const criteria = part.split(":");
+				// Look for function calls using double colon ::
+				// Eg the criteria is when the response of some API matches the final value
+				// Function signature is @context.path.to::functionName[argKey:argValue,anotherKey:@context.lookup.address]address.to.key.in.response:valueToMatch
+				const funcs = part.split("::");
 
-				const contextValue = getContextValue(criteria[0], contexts);
+				if (funcs.length > 1) {
+					let parsedFunctionValue = parseFunctionSignature(
+						funcs,
+						contexts
+					);
+					console.log("parsed", parsedFunctionValue);
 
-				// There is no colon to match a value, so the finalValue is the context value
-				if (criteria.length === 1) {
-					finalValue = contextValue;
-					break;
-				}
-
-				if (contextValue === null || contextValue === undefined) {
-					break;
-				}
-
-				const v =
-					criteria.length > 1
-						? criteria[1].split("||")
-						: [contextValue];
-				const matchingValue = Array.isArray(contextValue)
-					? contextValue.find((val) => v.includes(val))
-					: v.includes(contextValue);
-
-				if (matchingValue) {
-					parsedValue = contextValue;
-					partsMatched++;
+					if (parsedFunctionValue) {
+						parsedValue = parsedFunctionValue;
+						partsMatched++;
+					} else {
+						break;
+					}
 				} else {
-					break;
+					const criteria = part.split(":");
+
+					const contextValue = getContextValue(criteria[0], contexts);
+
+					// There is no colon to match a value, so the finalValue is the context value
+					if (criteria.length === 1) {
+						finalValue = contextValue;
+						break;
+					}
+
+					if (contextValue === null || contextValue === undefined) {
+						break;
+					}
+
+					const v =
+						criteria.length > 1
+							? criteria[1].split("||")
+							: [contextValue];
+					const matchingValue = Array.isArray(contextValue)
+						? contextValue.find((val) => v.includes(val))
+						: v.includes(contextValue);
+
+					if (matchingValue) {
+						parsedValue = contextValue;
+						partsMatched++;
+					} else {
+						break;
+					}
 				}
 			}
 		}
