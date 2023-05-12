@@ -31,17 +31,12 @@ For example: Turning this:
 ```
 Into this, depending on some criteria:
 ```
+// Maybe it's morning, maybe it's a user preference, maybe it's a current theme, maybe it's due to an active route?
 {
 	colors: {
 		background : '#DDD',
 		foreground: '#222'
 	}
-}
-
-for state:
-
-{
-	timeOfDay : 'morning'
 }
 
 ```
