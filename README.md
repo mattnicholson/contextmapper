@@ -11,7 +11,7 @@ The aim of these functions are to allow certain elements of logic to be abstract
 
 ### TL;DR:
 
-It takes an exhaustive set of possible data values, and turns them into a single, *true* set, based on the current state.
+It takes an exhaustive set of *potential* data values, and turns them into a single, *true* set, based on the current state.
 
 For example: Turning this:
 
@@ -47,6 +47,8 @@ for state:
 ```
 Criteria could be anything — time of day, user preference settings...
 you control how different contextual values resolve to different mutations of the data.
+
+This means throughout your application you can just use the `colors.background` property, and abstract what that actually resolves to in a different layer of the application.
 
 ## Quickstart
 
