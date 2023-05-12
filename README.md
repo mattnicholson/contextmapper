@@ -214,3 +214,63 @@ e.g in React:
 <MyGreetingComponent greeting={actualContent.greeting} />
 
 ```
+
+### More dynamic example
+
+The following example shows how a function can actually be run *as part of the criteria* and then evaluate the response of that function to check whether to map to object to that value.
+
+```
+// Our current state
+// ----------------------------------------
+const stateMap = {
+	"@auth": : {
+		user : {
+			timezone : "en"
+		}
+	}
+	"@date": {
+		// Here our state actually contains a function we can call at runtime whenever we are re-evalutating to resolve a value
+		getTime: getTime: ({timezone:'en'}) => {
+			// Imaginary function that returns a Date for a timezone
+			const now = new DateForTimezone(timezone);
+			const hours = now.getHours();
+			return { hours: hours };
+		},
+	},
+
+};
+
+// Our content model with contextual rules
+// -----------------------------------------
+const content = {
+
+	greeting: {
+		default: "Hello World",
+		// Here we actually call the getTime() function in our state object, and evaluate its response as part of our criteria
+		// If the function call returns an object {hours} with hours property less than or equal to 11, then resolve property 'Morning, World!'
+		"@date::getTime[].hours:<=11": "Morning, World!",
+		// If the response.hours is greater than or equal to 12, then resolve to 'Afternoon, World!'
+		"@date::getTime[].hours:>=12": "Afternoon, World!",
+	}
+
+};
+
+// This is essentially the same as the previous example
+// But you can pass arguments that refer back to the context state map, which makes it a powerful feature...
+
+// Referring back to context within function expressions
+// -----------------------------------------
+const content = {
+
+	greeting: {
+		default: "Hello World",
+		// If we are holding some user-specific value in state, we can refer back to it as an argument
+		// Maybe our getTime function can check for a timezone based on the user timezone
+		// Now it can generate different values by interpolating the state values for a unique context
+		"@date::getTime[timezone:@auth.user.timezone].hours:<=11": "Morning, World!",
+		"@date::getTime[timezone:@auth.user.timezone].hours:>=12": "Afternoon, World!",
+	}
+
+};
+
+```
