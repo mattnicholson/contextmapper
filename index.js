@@ -43,6 +43,8 @@
 	it says that when the context's @date.meridiem property is equal to 'am'
 	then make the source object's 'title' property 'Good Morning World' rather than its default
 
+
+
 */
 
 export const hoistContextualValues = (obj, { contexts }) => {
@@ -59,6 +61,29 @@ export const hoistContextualValues = (obj, { contexts }) => {
 
 	return { ...hoisted };
 };
+
+/*
+
+	memoize
+	------------------
+
+	Cache a function call based on its stringified arguments
+	Can optionally be used to wrap functions to cache their result
+
+*/
+
+export function memoize(func) {
+	const cache = new Map();
+	return function (...args) {
+		const key = JSON.stringify(args);
+		if (cache.has(key)) {
+			return cache.get(key);
+		}
+		const result = func(...args);
+		cache.set(key, result);
+		return result;
+	};
+}
 
 /*
 
@@ -157,6 +182,77 @@ export function getNestedObjectProp(o, s) {
 */
 
 export function parseFunctionSignature(signature, contexts) {
+	const address = signature[0];
+
+	let pathToFunction = getNestedObjectProp(contexts, address);
+
+	if (!pathToFunction) return null;
+
+	const toParse = signature[1];
+
+	// toParse example: getTime[timezone:en,status:@auth.loggedIn.status].fulltime.hrs:>=14
+
+	const regex =
+		/^(?<functionName>[^\[]+)\[(?<args>[^\]]*)\](?<property>.+):(?<match>.+)$/;
+
+	/*
+
+	^                          # Match the start of the string
+	(?<functionName>[^\[]+)    # Match and capture one or more characters that are not an opening square bracket in a named capture group called "functionName"
+	\[                         # Match an opening square bracket
+	(?<args>[^\]]*)            # Match and capture zero or more characters that are not a closing square bracket in a named capture group called "args"
+	\]                         # Match a closing square bracket
+	(?<property>.+)            # Match and capture one or more characters in a named capture group called "property"
+	:                          # Match a colon
+	(?<match>.+)               # Match and capture one or more characters in a named capture group called "match"
+	$                          # Match the end of the string
+
+	*/
+
+	const match = toParse.match(regex);
+
+	if (!match) {
+		console.error("Invalid signature format");
+		return null;
+	}
+
+	const { functionName, args, property, match: expectedMatch } = match.groups;
+
+	if (
+		!(
+			functionName &&
+			pathToFunction[functionName] &&
+			typeof pathToFunction[functionName] === "function"
+		)
+	) {
+		return null;
+	}
+
+	const fn = pathToFunction[functionName];
+
+	const callProps = args
+		? args.split(",").reduce((reduced, item) => {
+				const [k, v] = item.split(":");
+				if (v && v[0] === "@") {
+					reduced[k] = getContextValue(v, contexts);
+				} else {
+					reduced[k] = v;
+				}
+				return reduced;
+		  }, {})
+		: {};
+
+	const response = fn(callProps);
+
+	const finalValue = property
+		? getNestedObjectProp(response, property)
+		: response;
+
+	const isMatch = doesCriteriaValueMatch(finalValue, expectedMatch);
+	return isMatch ? finalValue : null;
+}
+
+export function parseFunctionSignature_nonRegex(signature, contexts) {
 	const address = signature[0];
 
 	let pathToFunction = getNestedObjectProp(contexts, address);
@@ -295,7 +391,6 @@ export const reconcileContextualValue = (obj, contexts) => {
 						funcs,
 						contexts
 					);
-					console.log("parsed", parsedFunctionValue);
 
 					if (parsedFunctionValue) {
 						parsedValue = parsedFunctionValue;
