@@ -64,7 +64,7 @@ const contextMap = {
 };
 const example1 = {
 	id: 23,
-	title: {
+	greeting: {
 		default: "Hello World",
 		"@date.meridiem:am": "Morning, World!",
 		"@date.meridiem:pm": "Afternoon, World!",
@@ -78,7 +78,18 @@ const example2 = {
 };
 
 export const runContextMapExamples = () => {
+	console.log("++++++++++++++++++++++++++++");
+	console.log("BEGIN");
+	console.log("++++++++++++++++++++++++++++");
+	const actualData = hoistContextualValues(example1, {
+			contexts: {
+				...contextMap,
+			},
+		});
+	console.log("Basic Greeting:",actualData.greeting );
+	console.log("---------------------------");
 	console.log("Context Map", contextMap);
+	console.log("---------------------------");
 	console.log(
 		"Example 1:",
 		example1,
@@ -89,6 +100,7 @@ export const runContextMapExamples = () => {
 			},
 		})
 	);
+	console.log("---------------------------");
 	console.log(
 		"Example 2 (Logged In):",
 		example2,
@@ -99,6 +111,7 @@ export const runContextMapExamples = () => {
 			},
 		})
 	);
+	console.log("---------------------------");
 	console.log(
 		"Example 2 (Logged In, Different Language):",
 		example2,
@@ -113,6 +126,7 @@ export const runContextMapExamples = () => {
 			},
 		})
 	);
+	console.log("---------------------------");
 	console.log(
 		"Example 2 (Logged Out):",
 		example2,
@@ -131,4 +145,7 @@ export const runContextMapExamples = () => {
 			},
 		})
 	);
+	console.log("++++++++++++++++++++++++++++");
+	console.log("END");
+	console.log("++++++++++++++++++++++++++++");
 };
